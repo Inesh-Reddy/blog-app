@@ -10,12 +10,22 @@ const salt: string = process.env.SALT_ROUNDS as string;
 export const register = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
   try {
+    if (!username || !email || !password) {
+      res.json({
+        msg: `Please provide all fields`,
+      });
+    }
+  } catch (error) {
+    res.json({
+      msg: `Error : fileds missing`,
+    });
+  }
+  try {
     const password_hash = await bcrypt.hash(password, parseInt(salt));
     const registerQuery =
       "INSERT INTO users(username, email, password_hash) VALUES($1, $2, $3)";
     await pgClient.query(registerQuery, [username, email, password_hash]);
 
-    console.log(`✅ user: ${username} created successfully.`);
     res.json({
       msg: `✅ user: ${username} created successfully.`,
     });
