@@ -1,4 +1,6 @@
 import { pgClient } from "../db";
+// Posts: Columns: id (primary key), title, content, user_id (foreign key to Users).
+// Comments: Columns: id (primary key), content, post_id (foreign key to Posts), user_id (foreign key to Users).
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
@@ -15,6 +17,41 @@ export const initializeDatabase = async (): Promise<void> => {
     console.log("✅ Users table created (if not exists)");
   } catch (error) {
     console.error("❌ Error initializing users table:", error);
+    throw error;
+  }
+
+  try {
+    await pgClient.query(`
+        CREATE TABLE IF NOT EXISTS posts (
+          id SERIAL PRIMARY KEY,
+          title VARCHAR(100) UNIQUE NOT NULL,
+          content VARCHAR(100) NOT NULL,
+          user_id INTEGER,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        );
+      `);
+
+    console.log("✅ Posts table created (if not exists)");
+  } catch (error) {
+    console.log("❌ Error initializing posts table:", error);
+    throw error;
+  }
+
+  try {
+    await pgClient.query(`
+        CREATE TABLE IF NOT EXISTS comments (
+          id SERIAL PRIMARY KEY,
+          content VARCHAR(100) NOT NULL ,
+          post_Id INTEGER,
+          FOREIGN KEY (post_Id) REFERENCES posts(id) ON DELETE CASCADE,
+          user_Id INTEGER,
+          FOREIGN KEY (user_Id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
+
+    console.log("✅ comments table created (if not exists)");
+  } catch (error) {
+    console.log("❌ Error initializing comments table:", error);
     throw error;
   }
 };
