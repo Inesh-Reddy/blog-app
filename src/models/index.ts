@@ -25,7 +25,7 @@ export const initializeDatabase = async (): Promise<void> => {
         CREATE TABLE IF NOT EXISTS posts (
           id SERIAL PRIMARY KEY,
           title VARCHAR(100) UNIQUE NOT NULL,
-          content VARCHAR(100) NOT NULL,
+          content TEXT NOT NULL,
           user_id INTEGER,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         );
@@ -41,7 +41,7 @@ export const initializeDatabase = async (): Promise<void> => {
     await pgClient.query(`
         CREATE TABLE IF NOT EXISTS comments (
           id SERIAL PRIMARY KEY,
-          content VARCHAR(100) NOT NULL ,
+          content TEXT NOT NULL ,
           post_Id INTEGER,
           FOREIGN KEY (post_Id) REFERENCES posts(id) ON DELETE CASCADE,
           user_Id INTEGER,
